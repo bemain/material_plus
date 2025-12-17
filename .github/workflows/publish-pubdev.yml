@@ -1,0 +1,51 @@
+name: Publish to pub.dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run_only:
+        description: "Run dry-run only (no publish)"
+        type: boolean
+        default: false
+      tag:
+        description: "Optional tag or version reference (informational)"
+        type: string
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Configure pub credentials
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
+        run: |
+          mkdir -p "$HOME/.pub-cache"
+          if [ -z "$PUB_CREDENTIALS" ]; then
+            echo "PUB_CREDENTIALS secret is missing." >&2
+            exit 1
+          fi
+          printf "%s" "$PUB_CREDENTIALS" > "$HOME/.pub-cache/credentials.json"
+
+      - name: Verify package (dry-run)
+        run: |
+          dart pub publish --dry-run
+
+      - name: Publish to pub.dev
+        if: ${{ inputs.dry_run_only == false }}
+        run: |
+          # Use -f to skip confirmation prompt in CI
+          dart pub publish -f

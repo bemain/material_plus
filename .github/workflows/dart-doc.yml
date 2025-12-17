@@ -1,0 +1,33 @@
+name: Generate Dart Docs
+
+on:
+  push:
+    branches:
+      - main
+      - '**'
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Generate API docs
+        run: |
+          mkdir -p doc/api
+          dart doc . --output doc/api
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs
+          path: doc/api
