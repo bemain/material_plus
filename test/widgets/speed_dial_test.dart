@@ -8,10 +8,10 @@ void main() {
       MaterialApp(
         home: Scaffold(
           floatingActionButton: SpeedDial(
-            child: const Icon(Icons.add),
             children: const [
               SpeedDialAction(child: Icon(Icons.add), label: Text('Add')),
             ],
+            child: const Icon(Icons.add),
           ),
         ),
       ),
