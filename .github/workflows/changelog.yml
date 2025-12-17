@@ -17,11 +17,10 @@ jobs:
           fetch-depth: 0
 
       - name: Generate CHANGELOG with git-cliff
-        uses: orhun/git-cliff-action@v3
+        uses: orhun/git-cliff-action@v4
         with:
-          # Use repository config if present
           config: cliff.toml
-          args: --output CHANGELOG.md --tag-pattern '.*' --no-exec
+          args: --output CHANGELOG.md --tag-pattern '^v?\\d+\\.\\d+\\.\\d+$' --no-exec
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
