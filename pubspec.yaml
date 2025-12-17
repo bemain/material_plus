@@ -1,7 +1,7 @@
 name: material_plus
 description: "Material-style widgets and utilities"
 version: 0.1.0
-homepage:
+repository: https://github.com/bemain/material_plus
 
 environment:
   sdk: ^3.10.3
