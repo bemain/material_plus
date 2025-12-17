@@ -8,7 +8,6 @@ export 'src/widgets/alert_sheet.dart' show AlertSheet;
 export 'src/widgets/circular_slider/circular_slider.dart' show CircularSlider;
 export 'src/widgets/circular_slider/theme.dart' show CircularSliderTheme;
 export 'src/widgets/continuous_button.dart' show ContinuousButton;
-export 'src/widgets/flat_card.dart' show FlatCard;
 export 'src/widgets/loading.dart'
     show Shimmer, ShimmerLoading, TextPlaceholder, IconPlaceholder;
 export 'src/widgets/loading_checkmark.dart' show CircularLoadingCheck;
@@ -20,3 +19,5 @@ export 'src/widgets/segmented_tab_control/segmented_tab_control.dart'
 export 'src/widgets/speed_dial/action.dart' show SpeedDialAction;
 export 'src/widgets/speed_dial/spacer.dart' show SpeedDialSpacer;
 export 'src/widgets/speed_dial/speed_dial.dart' show SpeedDial, SpeedDialChild;
+export 'src/utils/clamp_duration.dart' show ClampDurationExtension;
+export 'src/utils/map_value_notifier.dart' show MapValueNotifierExtension;
