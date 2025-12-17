@@ -1,0 +1,32 @@
+name: Generate Changelog
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    name: Build CHANGELOG
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate CHANGELOG with git-cliff
+        uses: orhun/git-cliff-action@v3
+        with:
+          # Use repository config if present
+          config: cliff.toml
+          args: --output CHANGELOG.md --tag-pattern '.*' --no-exec
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit CHANGELOG
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(changelog): update CHANGELOG.md"
+          file_pattern: CHANGELOG.md

@@ -1,0 +1,93 @@
+name: Release Tag
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Generate changelog and publish to pub.dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Set version from Release tag in pubspec.yaml
+        id: bump_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag_name="${{ github.event.release.tag_name }}"
+          if [[ -z "$tag_name" ]]; then
+            echo "Release tag_name missing" >&2
+            exit 1
+          fi
+          # strip leading 'v' if present
+          version="${tag_name#v}"
+          echo "Setting pubspec.yaml version to $version"
+          cp pubspec.yaml pubspec.yaml.bak
+          awk -v ver="$version" '
+            BEGIN{updated=0}
+            /^version:\s*/{print "version: " ver; updated=1; next}
+            {print}
+            END{if(updated==0){print "version: " ver}}'
+            pubspec.yaml.bak > pubspec.yaml
+          rm -f pubspec.yaml.bak
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Dart analyze
+        run: dart analyze --fatal-infos --fatal-warnings
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Generate CHANGELOG with git-cliff
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --output CHANGELOG.md --tag-pattern '^v?\\d+\\.\\d+\\.\\d+$' --no-exec
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit updated CHANGELOG and pubspec version
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(release): ${{ steps.bump_version.outputs.version }} changelog + pubspec version"
+          file_pattern: |
+            CHANGELOG.md
+            pubspec.yaml
+
+      - name: Configure pub.dev credentials
+        shell: bash
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUB_CREDENTIALS }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PUB_CREDENTIALS:-}" ]]; then
+            echo "PUB_CREDENTIALS secret is missing."
+            exit 1
+          fi
+          mkdir -p "$HOME/.pub-cache"
+          echo "$PUB_CREDENTIALS" > "$HOME/.pub-cache/credentials.json"
+          echo "Wrote pub.dev credentials to ~/.pub-cache/credentials.json"
+
+      - name: Publish to pub.dev
+        env:
+          PUB_HOSTED_URL: https://pub.dev
+        run: |
+          # CI publishing must be non-interactive
+          dart pub publish --force

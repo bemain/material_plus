@@ -1,0 +1,49 @@
+# git-cliff configuration for generating CHANGELOG.md
+# Uses Conventional Commits: https://www.conventionalcommits.org/
+
+[core]
+# Parse commits from latest tag to HEAD by default
+from_latest_tag = false
+# Exclude merge commits
+filter_commits = true
+
+[git]
+# Treat these as conventional types
+commit_parsers = [
+  { message = "^feat", group = "Features" },
+  { message = "^fix", group = "Fixes" },
+  { message = "^perf", group = "Performance" },
+  { message = "^refactor", group = "Refactoring" },
+  { message = "^docs", group = "Docs" },
+  { message = "^style", group = "Style" },
+  { message = "^test", group = "Tests" },
+  { message = "^chore", group = "Chores" },
+]
+# Ignore commits that don't add value to changelog
+filter = [
+  "^Merge",
+  "^Revert",
+]
+
+[remote]
+# Optional: set repository info for links
+# Fill automatically from GitHub when running in action
+
+[cli]
+# Default output file
+output = "CHANGELOG.md"
+
+[generate]
+# Group commits by version/tag; if no tags, group by date ranges
+group_by = "group"
+
+[template]
+# Markdown template for the changelog
+# Variables: version, date, commits (array of commit), previous
+# See: https://github.com/orhun/git-cliff#templates
+header = "# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n"
+footer = "\n"
+
+# Section template per version
+# If tags exist, version will be the tag name; otherwise, a date range
+body = "{{#versions}}\n## {{#if version}}{{version}}{{/if}}{{#unless version}}{{date}}{{/unless}}\n\n{{#groups}}\n### {{title}}\n\n{{#commits}}\n- {{message}} ({{#if breaking}}BREAKING{{/if}}) [{{short_id}}]({{commit_url}})\n{{/commits}}\n\n{{/groups}}\n{{/versions}}\n"
