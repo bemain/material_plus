@@ -8,9 +8,7 @@ lints:
   stage: lints
   image: ghcr.io/cirruslabs/flutter:stable
   script:
-    - flutter doctor
     - flutter pub get
-    - dart --version
     - dart analyze --fatal-infos --fatal-warnings
   only:
     - main
