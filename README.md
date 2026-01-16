@@ -1,9 +1,8 @@
-Material Plus is a collection of Flutter utilities and Material-inspired widgets that help you prototype and ship polished UIs faster.
+Material Plus is a collection of Flutter utilities and Material-inspired widgets.
 
 ## Highlights
-- Widgets: alert sheets, circular slider with theming, segmented tabs, number field, speed dial, shimmer/loading states, measure-size helper, continuous button, circular loading check.
-- Utils: list/map notifiers, persisted values, process helper, duration clamp, safe casting, string casing.
-- Works with Flutter apps or packages; exports live under package:material_plus/material_plus.dart.
+- Widgets: alert sheets, circular slider, segmented tabs, number field, speed dial, shimmer/loading states.
+- Utils: list/map notifiers, persisted values, process helper, string casing.
 
 ## Install
 Add the package and fetch dependencies:
