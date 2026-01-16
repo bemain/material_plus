@@ -1,12 +1,12 @@
 stages:
-  - analyze
+  - lints
   - test
   - release
   - changelog
 
-analyze:
-  stage: analyze
-  image: cirrusci/flutter:stable
+lints:
+  stage: lints
+  image: ghcr.io/cirruslabs/flutter:stable
   script:
     - flutter doctor
     - flutter pub get
@@ -18,7 +18,7 @@ analyze:
 
 test:
   stage: test
-  image: cirrusci/flutter:stable
+  image: ghcr.io/cirruslabs/flutter:stable
   script:
     - flutter pub get
     - flutter test
@@ -28,7 +28,7 @@ test:
 
 release:
   stage: release
-  image: cirrusci/flutter:stable
+  image: ghcr.io/cirruslabs/flutter:stable
   script:
     - |
       tag_name="${CI_COMMIT_TAG}"
