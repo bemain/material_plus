@@ -59,11 +59,13 @@ changelog:
     - apk add --no-cache git
     - apk add --no-cache bash
   script:
-    - git config --global user.email "gitlab-ci@example.com"
-    - git config --global user.name "GitLab CI"
+    - |
+      git config --global user.email "gitlab-ci@example.com"
+      git config --global user.name "GitLab CI"
     - git cliff --config cliff.toml --output CHANGELOG.md --tag-pattern '^v?\d+\.\d+\.\d+$' --no-exec
-    - git add CHANGELOG.md
-    - git commit -m "chore(changelog): update CHANGELOG.md"
+    - |
+      git add CHANGELOG.md
+      git commit -m "chore(changelog): update CHANGELOG.md"
     - git push origin HEAD
   only:
     - schedules
