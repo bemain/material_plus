@@ -35,7 +35,8 @@ class TransformedPersistentValue<T, S> extends ValueNotifier<T> {
 
 class PersistentValue<T> extends ValueNotifier<T> {
   /// A value that is persisted to disk whenever it changes.
-  PersistentValue(this.key, {required T initialValue}) : super(initialValue) {
+  PersistentValue(this.key, {required this.initialValue})
+    : super(initialValue) {
     assert(
       [bool, String, int, double, List<String>].contains(T),
       "Unsupported type for PersistentValue: $T",
@@ -53,10 +54,14 @@ class PersistentValue<T> extends ValueNotifier<T> {
   /// The key to where the value is persisted to disk.
   final String key;
 
+  final T initialValue;
+
   @override
-  T get value => (<T>[] is List<List>)
-      ? preferences.getStringList(key)!.cast<String>() as T
-      : preferences.get(key) as T;
+  T get value =>
+      ((<T>[] is List<List>)
+          ? preferences.getStringList(key)?.cast<String>() as T?
+          : preferences.get(key) as T?) ??
+      initialValue;
   @override
   set value(T newValue) {
     if (preferences.get(key) == newValue) return; // Do nothing
