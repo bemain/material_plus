@@ -1,6 +1,4 @@
 export 'src/utils/list_notifier.dart' show ListNotifier;
-export 'src/utils/persistent_value.dart'
-    show PersistentValue, TransformedPersistentValue;
 export 'src/utils/process.dart' show Process;
 export 'src/utils/string_casing.dart' show StringCasingExtension;
 export 'src/utils/try_cast.dart' show tryCast;
