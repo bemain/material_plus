@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for pushing the regenerated changelog.
+      contents: write
+      # Required for authenticating against pub.dev using OIDC.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Check out the branch rather than the tag, so that the regenerated
+          # changelog can be committed back to it.
+          ref: main
+          fetch-depth: 0
+      - name: Verify that the tag points at the tip of main
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$GITHUB_SHA" ]; then
+            echo "::error::${GITHUB_REF_NAME} is not the tip of main; refusing to release."
+            exit 1
+          fi
+      - uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --tag-pattern '^v?\d+\.\d+\.\d+$' --no-exec
+        env:
+          OUTPUT: CHANGELOG.md
+      # Provisions the OIDC token used for publishing; must run before Flutter
+      # is set up so that `flutter pub publish` picks up the credentials.
+      - uses: dart-lang/setup-dart@v1
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          channel: stable
+          version: latest
+      - name: Set pubspec version from tag
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          echo "Setting pubspec.yaml version to $version"
+          sed -i -E "s|^version:.*|version: ${version}|" pubspec.yaml
+      - run: flutter pub get
+      - run: flutter pub publish --dry-run
+      - run: flutter pub publish --force
+      - name: Commit changelog
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add CHANGELOG.md
+          git diff --staged --quiet || git commit -m "chore(changelog): update CHANGELOG.md"
+          git push
