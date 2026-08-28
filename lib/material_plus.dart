@@ -1,5 +1,4 @@
 export 'src/utils/list_notifier.dart' show ListNotifier;
-export 'src/utils/process.dart' show Process;
 export 'src/utils/string_casing.dart' show StringCasingExtension;
 export 'src/utils/try_cast.dart' show tryCast;
 export 'src/widgets/alert_sheet.dart' show AlertSheet;
